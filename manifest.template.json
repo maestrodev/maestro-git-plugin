@@ -97,7 +97,7 @@
     "type":    "ruby",
     "dependencies":[
     ],
-    "task":{    {
+    "task":{
       "command": "/git/tag",
       "inputs": {
         "path": {
