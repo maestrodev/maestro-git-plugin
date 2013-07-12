@@ -1,0 +1,146 @@
+{
+  "tasks": [{
+    "name": "git clone",
+    "description": "Clone A Git Repository",
+    "license": "Apache 2.0",
+    "author":  "MaestroDev",
+    "version": "updated at build time",
+    "class":   "MaestroDev::GitWorker",
+    "type":    "ruby",
+    "dependencies":[
+    ],
+    "task":{
+      "command": "/git/clone",
+      "inputs": {
+        "path": {
+          "description": "Local Path For Cloning. By default agent's $HOME/wc/composition_name-id and can be referred to with #{fields[:scm_path]} or #{fields[:git_path]}",
+          "required": false,
+          "type": "String",
+          "value": null
+        },
+        "url": {
+          "description": "Remote Location Of The Git Repository",
+          "required": true,
+          "type": "Url",
+          "value": null
+        },
+        "branch": {
+          "description": "Branch Of The Repository To Checkout",
+          "required": false,
+          "type": "String",
+          "value": null
+        },
+        "clean_working_copy": {
+          "description": "Remove Local Working Copy",
+          "required": false,
+          "type": "Boolean",
+          "value": false
+        },
+        "force_build": {
+          "description": "Build If No Update Is Found",
+          "required": false,
+          "type": "Boolean",
+          "value": false
+        }
+      },
+      "type": "remote",
+      "tool_name": "SCM",
+      "outputs": {"output" : {"type" : "String"}},
+      "icon": "git.png"
+    }
+  },
+  {
+    "name": "git branch",
+    "description": "Create A Branch And Push It To A Remote Repository",
+    "license": "Apache 2.0",
+    "author":  "MaestroDev",
+    "version": "updated at build time",
+    "class":   "MaestroDev::GitWorker",
+    "type":    "ruby",
+    "dependencies":[
+    ],
+    "task":{
+      "command": "/git/branch",
+      "inputs": {
+        "path": {
+          "description": "Is The Local Path",
+          "required": false,
+          "type": "String",
+          "value": null
+        },
+        "branch_name": {
+          "description": "Name Of The New Branch",
+          "required": true,
+          "type": "String",
+          "value": null
+        },
+        "remote_repo": {
+          "description": "Alias For The Remote Repository (origin)",
+          "required": true,
+          "type": "String",
+          "value": "origin"
+        }
+      },
+      "type": "remote",
+      "tool_name": "SCM",
+      "outputs": {"output" : {"type" : "String"}},
+      "icon": "git.png"
+    }
+  },
+  {
+    "name": "git tag",
+    "description": "Create A Tag And Push It To A Remote Repository",
+    "license": "Apache 2.0",
+    "author":  "MaestroDev",
+    "version": "updated at build time",
+    "class":   "MaestroDev::GitWorker",
+    "type":    "ruby",
+    "dependencies":[
+    ],
+    "task":{    {
+      "command": "/git/tag",
+      "inputs": {
+        "path": {
+          "description": "Is The Local Path",
+          "required": false,
+          "type": "String",
+          "value": null
+        },
+        "tag_name": {
+          "description": "Name Of The New Tag",
+          "required": true,
+          "type": "String",
+          "value": null
+        },
+        "commit checksum": {
+          "description": "Checksum For the Commit",
+          "required": false,
+          "type": "String",
+          "value": null
+        },
+        "message": {
+          "description": "Commit Message",
+          "required": false,
+          "type": "String",
+          "value": null
+        },
+        "remote_repo": {
+          "description": "Alias For The Remote Repository (origin)",
+          "required": true,
+          "type": "String",
+          "value": "origin"
+        },
+        "remote_branch": {
+          "description": "Name Of The Remote Branch (master)",
+          "required": true,
+          "type": "String",
+          "value": "master"
+        }
+      },
+      "type": "remote",
+      "tool_name": "SCM",
+      "outputs": {"output" : {"type" : "String"}},
+      "icon": "git.png"
+    }
+  }]
+}
