@@ -1,7 +1,7 @@
 maestro-git-plugin
 ====================
 
-A Maestro Plugin that allows execution of shell commands
+A Maestro Plugin that allows execution of git commands
 
 Task
 ----

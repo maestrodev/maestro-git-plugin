@@ -33,13 +33,13 @@ module MaestroDev
           Maestro.log.debug "Git clone: #{@path} exists, pulling instead"
           write_output("\nUpdating repo - #{@url} at #{@path}\n", :buffer => true)
           clone_script =<<-PULL
-cd #{@path} && #{@environment.empty? ? "": "#{Maestro::Util::Shell::ENV_EXPORT_COMMAND} #{@environment} &&" } #{@executable} pull
+cd #{@path} && #{@env}#{@executable} pull
 PULL
         else
           # first clone
           write_output("\nCloning repo - #{@url} to #{@path}\n", :buffer => true)
           clone_script =<<-CLONE
-#{@environment.empty? ? "": "#{Maestro::Util::Shell::ENV_EXPORT_COMMAND} #{@environment} &&" } #{@executable} clone -v #{@url} #{@path}
+#{@env}#{@executable} clone -v #{@url} #{@path}
 CLONE
         end
 
@@ -51,7 +51,7 @@ CLONE
         unless !shell.exit_code.success? or @branch.empty? or @branch == "master" 
           checkout = Maestro::Util::Shell.new
           checkout_script =<<-CHECKOUT
-cd #{@path} && #{@environment.empty? ? "": "#{Maestro::Util::Shell::ENV_EXPORT_COMMAND} #{@environment} &&" } #{@executable} checkout #{@branch}
+cd #{@path} && #{@env}#{@executable} checkout #{@branch}
 CHECKOUT
         
           checkout.create_script(checkout_script)
@@ -88,7 +88,7 @@ CHECKOUT
         Maestro.log.warn("Error executing Git Clone Task: #{e.class} #{e}: " + e.backtrace.join("\n"))
       end
       
-      write_output "\n\nGIT CLONE task complete"
+      write_output "\n\nGIT CLONE task complete\n"
       set_error(@error) if @error
     end
 
@@ -103,8 +103,7 @@ CHECKOUT
         write_output("\nCreating the branch: #{@branch} in the repo at #{@path}\n", :buffer => true)
       
         branch_script =<<-BRANCH
-cd #{@path} && \
-#{@environment.empty? ? "": "#{Maestro::Util::Shell::ENV_EXPORT_COMMAND} #{@environment} &&" } \
+cd #{@path} && #{@env} \
 #{@executable} branch -v #{@branch} && \
 #{@executable} push -v #{@remote_repo} #{@branch}
 BRANCH
@@ -121,7 +120,7 @@ BRANCH
         Maestro.log.warn("Error executing Git Branch Task: #{e.class} #{e}: " + e.backtrace.join("\n"))
       end
 
-      write_output "\n\nGIT BRANCH task complete"
+      write_output "\n\nGIT BRANCH task complete\n"
       set_error(@error) if @error
     end
 
@@ -153,8 +152,7 @@ BRANCH
         pushcommand = "push -v --tags #{@remote_repo} #{@branch}"
 
         tag_script =<<-TAG
-cd #{@path} && \
-#{@environment.empty? ? "": "#{Maestro::Util::Shell::ENV_EXPORT_COMMAND} #{@environment} &&" } \
+cd #{@path} && #{@env} \
 #{@executable} #{tagcommand} && \
 #{@executable} #{pushcommand}
 TAG
@@ -171,7 +169,7 @@ TAG
         Maestro.log.warn("Error executing Git Tag Task: #{e.class} #{e}: " + e.backtrace.join("\n"))
       end
 
-      write_output "\n\nGIT TAG task complete"
+      write_output "\n\nGIT TAG task complete\n"
       set_error(@error) if @error
     end
 
@@ -214,7 +212,8 @@ TAG
       @executable = get_field('executable', 'git')
       @path = get_field('path') || default_path
       @environment = get_field('environment', '')
-      
+      @env = @environment.empty? ? "" : "#{Maestro::Util::Shell::ENV_EXPORT_COMMAND} #{@environment.gsub(/(&&|[;&])\s*$/, '')} && "
+
       save_output_value('repo_path', @path)
 
       errors << 'git not installed (or not on path)' if !valid_executable?(@executable)
