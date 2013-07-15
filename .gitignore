@@ -1,4 +1,6 @@
 *.gem
+manifest.json
+*.zip
 *.rbc
 .bundle
 .config
