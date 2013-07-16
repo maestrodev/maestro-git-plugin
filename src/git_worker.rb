@@ -45,6 +45,7 @@ CLONE
 
         shell = Maestro::Util::Shell.new
         shell.create_script(clone_script)
+        write_output("\nRunning command:\n----------\n#{clone_script}\n----------\n")
         shell.run_script_with_delegate(self, :on_output)
         raise GitError, "Error cloning repo #{shell.output}" unless shell.exit_code.success?
       
@@ -55,6 +56,7 @@ cd #{@path} && #{@env}#{@executable} checkout #{@branch}
 CHECKOUT
         
           checkout.create_script(checkout_script)
+          write_output("\nRunning command:\n----------\n#{checkout_script}\n----------\n")
           checkout.run_script_with_delegate(self, :on_output)
           raise GitError, "Error on branch checkout #{shell.output}" unless checkout.exit_code.success?
         end
@@ -110,6 +112,7 @@ BRANCH
       
         shell = Maestro::Util::Shell.new
         shell.create_script(branch_script)
+        write_output("\nRunning command:\n----------\n#{branch_script}\n----------\n")
         shell.run_script_with_delegate(self, :on_output)
       
         @error = "Error creating the branch #{shell.output}" unless shell.exit_code.success?
@@ -159,6 +162,7 @@ TAG
 
         shell = Maestro::Util::Shell.new
         shell.create_script(tag_script)
+        write_output("\nRunning command:\n----------\n#{tag_script}\n----------\n")
         shell.run_script_with_delegate(self, :on_output)
 
         @error = "Error Tagging in git #{shell.output}" unless shell.exit_code.success?
@@ -173,7 +177,7 @@ TAG
       set_error(@error) if @error
     end
 
-    def on_output(text, is_stderr)
+    def on_output(text)
       write_output(text, :buffer => true)
     end
 
