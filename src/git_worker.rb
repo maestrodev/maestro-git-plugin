@@ -301,7 +301,7 @@ TAG
         :author_name => ''
       }
 
-      result = Maestro::Util::Shell.run_command('git log -1 --pretty=format:%ce,%cN\|%ae,%aN')
+      result = Maestro::Util::Shell.run_command("cd #{@path} && " + 'git log -1 --pretty=format:%ce,%cN\|%ae,%aN')
       # Result[0] = exitcode obj, Result[1] = output
       if result[0].success?
         data = result[1].chomp
