@@ -304,7 +304,7 @@ TAG
       result = Maestro::Util::Shell.run_command('git log -1 --pretty=format:%ce,%cN\|%ae,%aN')
       # Result[0] = exitcode obj, Result[1] = output
       if result[0].success?
-        data = result[1]
+        data = result[1].chomp
         peeps = data.split('|')
 
         if peeps.size > 0
@@ -318,6 +318,8 @@ TAG
           info[:author_email] = author[0]
           info[:author_name] = author[1]
         end
+      else
+        write_output("\nUnable to retrieve committer/author info.\n#{result[1]}")
       end
 
       info
