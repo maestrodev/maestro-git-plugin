@@ -4,7 +4,7 @@
 
   <groupId>com.maestrodev.maestro.plugins</groupId>
   <artifactId>maestro-git-plugin</artifactId>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <name>maestro-git-plugin</name>
   <packaging>pom</packaging>
 
