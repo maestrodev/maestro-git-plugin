@@ -5,7 +5,7 @@
     "license": "Apache 2.0",
     "author":  "MaestroDev",
     "version": "updated at build time",
-    "class":   "MaestroDev::GitWorker",
+    "class":   "MaestroDev::GitPlugin::GitWorker",
     "type":    "ruby",
     "dependencies":[
     ],
@@ -55,7 +55,7 @@
     "license": "Apache 2.0",
     "author":  "MaestroDev",
     "version": "updated at build time",
-    "class":   "MaestroDev::GitWorker",
+    "class":   "MaestroDev::GitPlugin::GitWorker",
     "type":    "ruby",
     "dependencies":[
     ],
@@ -93,7 +93,7 @@
     "license": "Apache 2.0",
     "author":  "MaestroDev",
     "version": "updated at build time",
-    "class":   "MaestroDev::GitWorker",
+    "class":   "MaestroDev::GitPlugin::GitWorker",
     "type":    "ruby",
     "dependencies":[
     ],

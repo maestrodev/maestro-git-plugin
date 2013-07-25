@@ -17,7 +17,7 @@
 
 require 'spec_helper'
 
-describe MaestroDev::GitWorker do
+describe MaestroDev::GitPlugin::GitWorker do
 
   before(:all) do
     Maestro::MaestroWorker.mock!
