@@ -17,7 +17,7 @@
 
 require 'spec_helper'
 
-describe MaestroDev::GitPlugin::GitWorker do
+describe MaestroDev::Plugin::GitWorker do
 
   before(:all) do
     Maestro::MaestroWorker.mock!
@@ -115,7 +115,9 @@ describe MaestroDev::GitPlugin::GitWorker do
       subject.perform(:clone, workitem)
       
       workitem['fields']['__error__'].should_not be_nil
-      workitem['fields']['__error__'].should include("http://repo.or.cz/asdfasdf/adfasdf.git/info/refs")
+      workitem['fields']['__error__'].should eq('Error cloning repo')
+      workitem['__output__'].should include("http://repo.or.cz/asdfasdf/adfasdf.git/info/refs")
+
       File.exists?(@test_wc_path).should be_false
     end
     
@@ -168,8 +170,9 @@ describe MaestroDev::GitPlugin::GitWorker do
        subject.perform(:branch, workitem)
 
        workitem['__output__'].should_not include("Pushing to")
+       workitem['__output__'].should include("No such file or directory")
        workitem['fields']['__error__'].should_not be_nil
-       workitem['fields']['__error__'].should include("No such file or directory")
+       workitem['fields']['__error__'].should eq('Error creating the branch')
       # File.exists?(@test_wc_path).should be_false
      end
   end
@@ -199,8 +202,9 @@ describe MaestroDev::GitPlugin::GitWorker do
        subject.perform(:tag, workitem)
 
        workitem['__output__'].should_not include("Pushing to")
+       workitem['__output__'].should include("No such file or directory")
        workitem['fields']['__error__'].should_not be_nil
-       workitem['fields']['__error__'].should include("No such file or directory")
+       workitem['fields']['__error__'].should eq('Error tagging the repo')
      end
      
   end
