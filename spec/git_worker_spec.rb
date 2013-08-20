@@ -25,6 +25,7 @@ describe MaestroDev::Plugin::GitWorker do
     @dt = DateTime.now.strftime('%d%b%Y%H%M%S').to_s
     @test_wc_path = "/tmp/maestro-git-wc"
     @test_repo_path = "/tmp/maestro-git-repo"
+    @other_repo_path = "/tmp/some-other-git-repo"
     FileUtils.rm_rf @test_wc_path
     FileUtils.rm_rf @test_repo_path
 
@@ -137,6 +138,17 @@ describe MaestroDev::Plugin::GitWorker do
       File.exists?(@test_wc_path).should be_true
       File.exists?(readme).should be_true
       time.should eql(f.ctime)
+    end
+
+    it 'should fail to pull if existing repo points to different url' do
+      workitem = {'fields' => {'branch' => 'master', 'path' => @test_wc_path, 'url' => @test_repo_path}}
+
+      subject.perform(:clone, workitem)
+
+      workitem['fields']['url'] = @other_repo_path 
+      subject.perform(:clone, workitem)
+
+      workitem['fields']['__error__'].should include('squatting')
     end
 
   end

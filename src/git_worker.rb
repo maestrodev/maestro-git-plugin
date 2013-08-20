@@ -20,22 +20,34 @@ module MaestroDev
           write_output("\nDeleting old path - #{@path}", :buffer => true)
           FileUtils.rm_rf @path
         end
-  
+ 
+        use_clone = true
+
         if File.exists? @path
-          # pull instead of clone
-          Maestro.log.debug "Git clone: #{@path} exists, pulling instead"
+          remote_url = get_remote_origin
+
+          if remote_url
+            raise PluginError, "Request for git clone of '#{@url}' into '#{@path}', but #{remote_url} already squatting the " +
+              "directory.\nThis usually indicates two compositions are set to use the same directory for their checkouts.\n" +
+              "Either manually remove '#{@path}' or select the 'Clean Working Copy' option (if left on this will slow down " +
+              "repeated builds, increase checkout/update time, and generally reduce system efficiency)" if remote_url != @url
+            use_clone = false
+          end
+        end
+
+        if use_clone
+          # first clone
+          write_output("\nGit clone: cloning #{@url} to #{@path}\n", :buffer => true)
+          clone_script =<<-CLONE
+#{@env}#{@executable} clone -v #{@url} #{@path}
+CLONE
+        else
+          Maestro.log.debug "Git clone: repo already exists at #{@path}, pulling instead"
           write_output("\nUpdating repo - #{@url} at #{@path}\n", :buffer => true)
           clone_script =<<-PULL
 cd #{@path} && #{@env}#{@executable} pull
 PULL
-        else
-          # first clone
-          write_output("\nCloning repo - #{@url} to #{@path}\n", :buffer => true)
-          clone_script =<<-CLONE
-#{@env}#{@executable} clone -v #{@url} #{@path}
-CLONE
         end
-  
         shell = Maestro::Util::Shell.new
         shell.create_script(clone_script)
         write_output("\nRunning command:\n----------\n#{clone_script.chomp}\n----------\n")
@@ -252,7 +264,18 @@ TAG
       def get_remote_ref
         get_ref "refs\/remotes\/origin\/#{@branch}"
       end
-  
+
+      def get_remote_origin
+        url = nil 
+        result = Maestro::Util::Shell.run_command("cd #{@path} && #{@env}#{@executable} config --get remote.origin.url")
+
+        if result[0].success?
+          url = result[1].chomp
+        end
+
+        return url
+      end
+
       def get_committer_author_info
         info = {
           :committer_email => '',
