@@ -1,4 +1,5 @@
 {
+  "image": "git.png",
   "tasks": [{
     "name": "git clone",
     "description": "Clone A Git Repository",

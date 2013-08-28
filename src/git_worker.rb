@@ -9,9 +9,7 @@ module MaestroDev
   
       def clone
         validate_clone_parameters
-          
-        Maestro.log.info "Inputs:\n  path =       #{@path}\n  url =        #{@url}\n  branch =      #{@branch}\n  environment = #{@environment}\n  executable =  #{@executable}"
-  
+
         # save the path for later tasks
         set_field('scm_path', @path)
         set_field('git_path', @path)
@@ -85,16 +83,14 @@ CHECKOUT
         write_output("\ngit ref:   #{local_ref}\ncommitter: #{perpetrators[:committer_name]} (#{perpetrators[:committer_email]})\nauthor:    #{perpetrators[:author_name]} (#{perpetrators[:author_email]})", :buffer => true)
   
         if !latest_ref.nil? and !latest_ref.empty? and latest_ref == local_ref and !get_field('force_build')
-          write_output "\nReference From Previous Build #{latest_ref} Equals Latest From Repo Build Not Needed"
+          write_output "\nReference From Previous Build #{latest_ref} Equals Latest From Repo - Build Not Needed"
           not_needed
         end
       end
   
       def branch
         validate_branch_parameters
-          
-        Maestro.log.info "Inputs:\n  path =       #{@path}\n  branch_name = #{@branch}\n  environment = #{@environment}\n  executable =  #{@executable}\n  remote_repo = #{@remote_repo}"
-  
+
         write_output("\nCreating the branch: #{@branch} in the repo at #{@path}\n", :buffer => true)
         
         branch_script =<<-BRANCH
@@ -113,20 +109,10 @@ BRANCH
   
       def tag
         validate_tag_parameters
-          
-        Maestro.log.info "Inputs:\n" \
-          "  path =            #{@path}\n" \
-          "  branch_name =     #{@branch}\n" \
-          "  environment =     #{@environment}\n" \
-          "  executable =      #{@executable}\n" \
-          "  remote_repo =     #{@remote_repo}\n" \
-          "  tag_name =        #{@tag_name}\n" \
-          "  commit_checksum = #{@commit_checksum}\n" \
-          "  message =         #{@message}"
   
         write_output("Tagging the repo at #{@path} with tagname: #{@tag_name}", :buffer => true)
         write_output(" and commit checksum starting with #{@commit_checksum}", :buffer => true) unless @commit_checksum.empty?
-        write_output(" with the tag message: '#{workitem['fields']['message']}'", :buffer => true) if !workitem['fields']['message'].nil? && workitem['fields']['message']!=""
+        write_output(" with the tag message: '#{@message}'", :buffer => true) unless @message.empty?
         write_output(" and pushing it to the remote repository: #{@remote_repo} #{@branch}", :buffer => true)
   
         tagcommand = "tag -a #{@tag_name}"
@@ -164,24 +150,6 @@ TAG
         File.expand_path("~/wc/#{s}-#{get_field('composition_id', '')}")
       end
   
-      def booleanify(value)
-        res = false
-  
-        if value
-          if value.is_a?(TrueClass) || value.is_a?(FalseClass)
-            res = value
-          elsif value.is_a?(Fixnum)
-            res = value != 0
-          elsif value.respond_to?(:to_s)
-            value = value.to_s.downcase
-  
-            res = (value == 't' || value == 'true')
-          end
-        end
-  
-        res
-      end
-  
       def validate_common_parameters
         errors = []
   
@@ -202,8 +170,8 @@ TAG
   
         @branch = get_field('branch', 'master')
         @url = get_field('url', '')
-        @clean_working_copy = booleanify(get_field('clean_working_copy', false))
-        @force_build = booleanify(get_field('force_build', false))
+        @clean_working_copy = get_boolean_field('clean_working_copy')
+        @force_build = get_boolean_field('force_build')
   
         errors << 'no git url specified' if @url.empty?
   
