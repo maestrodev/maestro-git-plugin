@@ -1,5 +1,6 @@
 maestro-git-plugin
 ====================
+[![Code Climate](https://codeclimate.com/github/maestrodev/maestro-git-plugin.png)](https://codeclimate.com/github/maestrodev/maestro-git-plugin)
 
 A Maestro Plugin that allows execution of git commands
 
