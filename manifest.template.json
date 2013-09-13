@@ -132,16 +132,16 @@
           "value": null
         },
         "remote_repo": {
-          "description": "Alias For The Remote Repository (origin)",
-          "required": true,
+          "description": "The remote repository that is destination of a push operation. This parameter can be either a URL or the name of a remote (ie. origin)",
+          "required": false,
           "type": "String",
-          "value": "origin"
+          "value": null
         },
         "remote_branch": {
-          "description": "Name Of The Remote Branch (master)",
-          "required": true,
+          "description": "refspec: Specify what destination ref to update with what source object, often the name of the branch you would want to push (ie. master)",
+          "required": false,
           "type": "String",
-          "value": "master"
+          "value": null
         }
       },
       "type": "remote",
