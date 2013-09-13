@@ -117,7 +117,7 @@ describe MaestroDev::Plugin::GitWorker do
       
       workitem['fields']['__error__'].should_not be_nil
       workitem['fields']['__error__'].should eq('Error cloning repo')
-      workitem['__output__'].should include("http://repo.or.cz/asdfasdf/adfasdf.git/info/refs")
+      workitem['__output__'].should match("http://repo.or.cz/asdfasdf/adfasdf.git/")
 
       File.exists?(@test_wc_path).should be_false
     end
