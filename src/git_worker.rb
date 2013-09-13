@@ -36,15 +36,11 @@ module MaestroDev
         if use_clone
           # first clone
           write_output("\nGit clone: cloning #{@url} to #{@path}\n", :buffer => true)
-          clone_script =<<-CLONE
-#{@env}#{@executable} clone -v #{@url} #{@path}
-CLONE
+          clone_script = "#{@env}#{@executable} clone -v #{@url} #{@path}"
         else
           Maestro.log.debug "Git clone: repo already exists at #{@path}, pulling instead"
           write_output("\nUpdating repo - #{@url} at #{@path}\n", :buffer => true)
-          clone_script =<<-PULL
-cd #{@path} && #{@env}#{@executable} pull
-PULL
+          clone_script = "cd #{@path} && #{@env}#{@executable} pull"
         end
         shell = Maestro::Util::Shell.new
         shell.create_script(clone_script)
@@ -54,9 +50,7 @@ PULL
         
         unless !shell.exit_code.success? or @branch.empty? or @branch == "master" 
           checkout = Maestro::Util::Shell.new
-          checkout_script =<<-CHECKOUT
-cd #{@path} && #{@env}#{@executable} checkout #{@branch}
-CHECKOUT
+          checkout_script = "cd #{@path} && #{@env}#{@executable} checkout #{@branch}"
           
           checkout.create_script(checkout_script)
           write_output("\nRunning command:\n----------\n#{checkout_script.chomp}\n----------\n")
@@ -93,11 +87,7 @@ CHECKOUT
 
         write_output("\nCreating the branch: #{@branch} in the repo at #{@path}\n", :buffer => true)
         
-        branch_script =<<-BRANCH
-cd #{@path} && #{@env} \
-#{@executable} branch -v #{@branch} && \
-#{@executable} push -v #{@remote_repo} #{@branch}
-BRANCH
+        branch_script = "cd #{@path} && #{@env} #{@executable} branch -v #{@branch} && #{@executable} push -v #{@remote_repo} #{@branch}"
         
         shell = Maestro::Util::Shell.new
         shell.create_script(branch_script)
@@ -121,11 +111,7 @@ BRANCH
   
         pushcommand = "push -v --tags #{@remote_repo} #{@branch}"
   
-        tag_script =<<-TAG
-cd #{@path} && #{@env} \
-#{@executable} #{tagcommand} && \
-#{@executable} #{pushcommand}
-TAG
+        tag_script = "cd #{@path} && #{@env} #{@executable} #{tagcommand} && #{@executable} #{pushcommand}"
   
         shell = Maestro::Util::Shell.new
         shell.create_script(tag_script)
