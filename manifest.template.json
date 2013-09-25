@@ -149,5 +149,15 @@
       "outputs": {"output" : {"type" : "String"}},
       "icon": "git.png"
     }
-  }]
+  }],
+  "source_types": [
+    {
+      "name": "Git",
+      "options": {
+        "branch": "String",
+        "path": "String",
+        "url": "String"
+      }
+    }
+  ]
 }
