@@ -79,7 +79,7 @@ module MaestroDev
         tickets = get_tickets(latest_ref, local_ref)
 
         save_output_value('tickets', tickets)
-        write_output("\ntickets:   #{tickets.length} (#{tickets.join(', ')}", :buffer => true) unless tickets.empty?
+        write_output("\ntickets:   #{tickets.length} (#{tickets.join(', ')})", :buffer => true) unless tickets.empty?
 
         if !latest_ref.nil? and !latest_ref.empty? and latest_ref == local_ref and !get_field('force_build')
           write_output "\nReference From Previous Build #{latest_ref} Equals Latest From Repo - Build Not Needed"
