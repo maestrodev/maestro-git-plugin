@@ -269,14 +269,16 @@ module MaestroDev
 
       # Get a list of ticket id's (from git commit subject lines)
       # Assume format is "STRING-NUMBER<space>"*.  eg: "JIRA-123 JIRA-456"
+      # Gets tickets from all commit subjects between last & this - so if last was a long time ago,
+      # this list may be quite long
       # with possible bracketing [], {}, (), <> on each one.
       # @param previous_hash The hash that was last checked out for this repo
       # @param this_hash The hash that was just checked out for this repo
-      # TODO: Get all commit messages from this -> (last - 1)
       def get_tickets(previous_hash, this_hash)
         tickets = []
+        range = (previous_hash && !previous_hash.empty?) ? "#{previous_hash}...#{this_hash}" : '-1'
 
-        result = Maestro::Util::Shell.run_command("cd #{@path} && git log -1 --pretty=format:%s")
+        result = Maestro::Util::Shell.run_command("cd #{@path} && git log #{range} --pretty=format:%s")
         # Result[0] = exitcode obj, Result[1] = output
         if result[0].success?
           subjects = result[1].split("\n")
