@@ -1,162 +1,177 @@
 {
-  "image": "git.png",
+  "schema_version": 2,
+  "name":           "Git",
+  "description":    "Provides support for git clone, tag, and branch",
+  "author":         "MaestroDev",
+  "license":        "Apache 2.0",
+  "version":        "updated at build time",
+  "image":          "git.png",
+  "type":           "ruby",
+  "tool_name":      "SCM",
+  "tags":           ["git", "scm", "rcs", "vcs"],
   "tasks": [{
-    "name": "git clone",
-    "description": "Clone A Git Repository",
-    "license": "Apache 2.0",
-    "author":  "MaestroDev",
-    "version": "updated at build time",
-    "class":   "MaestroDev::Plugin::GitWorker",
-    "type":    "ruby",
-    "dependencies":[
-    ],
+    "name":         "git clone",
+    "description":  "Clone a Git repository",
+    "class":        "MaestroDev::Plugin::GitWorker",
     "task":{
-      "command": "/git/clone",
+      "command":    "/git/clone",
+      "outputs":    {"output" : {"type" : "String"}},
       "inputs": {
         "path": {
-          "description": "Local Path For Cloning. By default agent's $HOME/wc/composition_name-id and can be referred to with #{fields[:scm_path]} or #{fields[:git_path]}",
-          "required": false,
-          "type": "String",
-          "value": null
+          "description": "Local path to clone the Git repository to. By default agent's $HOME/wc/composition_name-id and can be referred to with #{fields[:scm_path]} or #{fields[:git_path]}",
+          "required":    false,
+          "type":        "String",
+          "value":       null,
+          "label":       "Path"
         },
         "url": {
-          "description": "Remote Location Of The Git Repository",
-          "required": true,
-          "type": "Url",
-          "value": null
+          "description": "Remote location of Git repository",
+          "required":    true,
+          "type":        "Url",
+          "value":       null,
+          "label":       "GIT URL"
         },
         "branch": {
-          "description": "Branch Of The Repository To Checkout",
-          "required": false,
-          "type": "String",
-          "value": null
+          "description": "Branch to checkout",
+          "required":    false,
+          "type":        "String",
+          "value":       null,
+          "label":       "Branch"
         },
         "clean_working_copy": {
-          "description": "Remove Local Working Copy",
-          "required": false,
-          "type": "Boolean",
-          "value": false
+          "description": "Remove local working copy before clone",
+          "required":    false,
+          "type":        "Boolean",
+          "value":       false,
+          "label":      "Clean Working Copy?"
         },
         "force_build": {
-          "description": "Build If No Update Is Found",
-          "required": false,
-          "type": "Boolean",
-          "value": false
+          "description": "Build if no changes detected?",
+          "required":    false,
+          "type":        "Boolean",
+          "value":       false,
+          "label":       "Force Build?"
         },
         "enable_repo_trigger": {
-          "description": "Auto-Build This Composition If Repository Trigger Fired",
-          "required": false,
-          "type": "Boolean",
-          "value": false
+          "description": "Auto-Build this composition if repository trigger fired",
+          "required":    false,
+          "type":        "Boolean",
+          "value":       false,
+          "label":       "Enable Repo Trigger?"
         }
-      },
-      "type": "remote",
-      "tool_name": "SCM",
-      "outputs": {"output" : {"type" : "String"}},
-      "icon": "git.png"
+      }
     }
   },
   {
-    "name": "git branch",
-    "description": "Create A Branch And Push It To A Remote Repository",
-    "license": "Apache 2.0",
-    "author":  "MaestroDev",
-    "version": "updated at build time",
-    "class":   "MaestroDev::Plugin::GitWorker",
-    "type":    "ruby",
-    "dependencies":[
-    ],
+    "name":        "git branch",
+    "description": "Create a new branch and push it to a repository",
+    "class":       "MaestroDev::Plugin::GitWorker",
     "task":{
-      "command": "/git/branch",
+      "command":   "/git/branch",
+      "outputs":   {"output" : {"type" : "String"}},
       "inputs": {
         "path": {
-          "description": "Is The Local Path",
-          "required": false,
-          "type": "String",
-          "value": null
+          "description": "The local path the Git repo is checked out to",
+          "required":    false,
+          "type":        "String",
+          "value":       null,
+          "label":       "Path"
         },
         "branch_name": {
-          "description": "Name Of The New Branch",
-          "required": true,
-          "type": "String",
-          "value": null
-        },
-        "remote_repo": {
-          "description": "Alias For The Remote Repository (origin)",
-          "required": true,
-          "type": "String",
-          "value": "origin"
-        }
-      },
-      "type": "remote",
-      "tool_name": "SCM",
-      "outputs": {"output" : {"type" : "String"}},
-      "icon": "git.png"
-    }
-  },
-  {
-    "name": "git tag",
-    "description": "Create A Tag And Push It To A Remote Repository",
-    "license": "Apache 2.0",
-    "author":  "MaestroDev",
-    "version": "updated at build time",
-    "class":   "MaestroDev::Plugin::GitWorker",
-    "type":    "ruby",
-    "dependencies":[
-    ],
-    "task":{
-      "command": "/git/tag",
-      "inputs": {
-        "path": {
-          "description": "Is The Local Path",
-          "required": false,
-          "type": "String",
-          "value": null
-        },
-        "tag_name": {
-          "description": "Name Of The New Tag",
-          "required": true,
-          "type": "String",
-          "value": null
-        },
-        "commit checksum": {
-          "description": "Checksum For the Commit",
-          "required": false,
-          "type": "String",
-          "value": null
-        },
-        "message": {
-          "description": "Commit Message",
-          "required": false,
-          "type": "String",
-          "value": null
+          "description": "Name of the new branch",
+          "required":    true,
+          "type":        "String",
+          "value":       null,
+          "label":       "Branch Name"
         },
         "remote_repo": {
           "description": "The remote repository that is destination of a push operation. This parameter can be either a URL or the name of a remote (ie. origin)",
-          "required": false,
-          "type": "String",
-          "value": null
+          "required":    true,
+          "type":        "String",
+          "value":       "origin",
+          "label":       "Remote Repo"
+        }
+      }
+    }
+  },
+  {
+    "name":        "git tag",
+    "description": "Create a new tag and push it to a repository",
+    "class":       "MaestroDev::Plugin::GitWorker",
+    "task":{
+      "command":   "/git/tag",
+      "outputs":   {"output" : {"type" : "String"}},
+      "inputs": {
+        "path": {
+          "description": "The local path the Git repo is checked out to",
+          "required":    false,
+          "type":        "String",
+          "value":       null,
+          "label":       "Path"
+        },
+        "tag_name": {
+          "description": "Name of the new tag",
+          "required":    true,
+          "type":        "String",
+          "value":       null,
+          "label":       "Tag Name"
+        },
+        "commit checksum": {
+          "description": "Git hash of the commit to tag (default = most recent)",
+          "required":    false,
+          "type":        "String",
+          "value":       null,
+          "label":       "Commit to tag"
+        },
+        "message": {
+          "description": "Commit message",
+          "required":    false,
+          "type":        "String",
+          "value":       null,
+          "label":       "Commit Message"
+        },
+        "remote_repo": {
+          "description": "The remote repository that is destination of a push operation. This parameter can be either a URL or the name of a remote (ie. origin)",
+          "required":    false,
+          "type":        "String",
+          "value":       null,
+          "label":       "Remote Repo"
         },
         "remote_branch": {
           "description": "refspec: Specify what destination ref to update with what source object, often the name of the branch you would want to push (ie. master)",
-          "required": false,
-          "type": "String",
-          "value": null
+          "required":    false,
+          "type":        "String",
+          "value":       null,
+          "label":       "Remote Branch"
         }
-      },
-      "type": "remote",
-      "tool_name": "SCM",
-      "outputs": {"output" : {"type" : "String"}},
-      "icon": "git.png"
+      }
     }
   }],
   "source_types": [
     {
       "name": "Git",
       "options": {
-        "branch": "String",
-        "path": "String",
-        "url": "String"
+        "path": {
+          "description": "The local path the Git repo is checked out to",
+          "required":    false,
+          "type":        "String",
+          "value":       null,
+          "label":       "Path"
+        },
+        "url": {
+          "description": "Remote location of Git repository",
+          "required":    true,
+          "type":        "Url",
+          "value":       null,
+          "label":       "GIT URL"
+        },
+        "branch": {
+          "description": "Branch to work on",
+          "required":    false,
+          "type":        "String",
+          "value":       null,
+          "label":       "Branch"
+        }
       }
     }
   ]
