@@ -4,21 +4,21 @@ require 'maestro_shell'
 
 module MaestroDev
   module Plugin
-    
+
     class GitWorker < Maestro::MaestroWorker
-  
+
       def clone
         validate_clone_parameters
 
         # save the path for later tasks
         set_field('scm_path', @path)
         set_field('git_path', @path)
-  
+
         if File.exists? @path and @clean_working_copy
           write_output("\nDeleting old path - #{@path}", :buffer => true)
           FileUtils.rm_rf @path
         end
- 
+
         use_clone = true
 
         if File.exists? @path
@@ -47,41 +47,46 @@ module MaestroDev
         write_output("\nRunning command:\n----------\n#{clone_script.chomp}\n----------\n")
         shell.run_script_with_delegate(self, :on_output)
         raise PluginError, "Error cloning repo" unless shell.exit_code.success?
-        
+
         unless !shell.exit_code.success? or @branch.empty? or @branch == "master" 
           checkout = Maestro::Util::Shell.new
           checkout_script = "cd #{@path} && #{@env}#{@executable} checkout #{@branch}"
-          
+
           checkout.create_script(checkout_script)
           write_output("\nRunning command:\n----------\n#{checkout_script.chomp}\n----------\n")
           checkout.run_script_with_delegate(self, :on_output)
           raise PluginError, "Error on branch checkout" unless checkout.exit_code.success?
         end
-        
+
         latest_ref = read_output_value('reference')
         local_ref = get_local_ref
         write_output("\nPrevious build used git ref: #{latest_ref}, this update is ref: #{local_ref}, force_build: #{@force_build}", :buffer => true)
-  
+
         save_output_value('reference', local_ref)
         save_output_value('url', @url)
         save_output_value('branch', @branch)
         save_output_value('commit_id', local_ref)  # Same as reference, but name should be consistent with other VCS
-  
+
         perpetrators = get_committer_author_info
-  
+
         save_output_value('committer_email', perpetrators[:committer_email])
         save_output_value('committer_name', perpetrators[:committer_name])
         save_output_value('author_email', perpetrators[:author_email])
         save_output_value('author_name', perpetrators[:author_name])
-  
+
         write_output("\ngit ref:   #{local_ref}\ncommitter: #{perpetrators[:committer_name]} (#{perpetrators[:committer_email]})\nauthor:    #{perpetrators[:author_name]} (#{perpetrators[:author_email]})", :buffer => true)
-  
+
+        tickets = get_tickets(latest_ref, local_ref)
+
+        save_output_value('tickets', tickets)
+        write_output("\ntickets:   #{tickets.length} (#{tickets.join(', ')}", :buffer => true) unless tickets.empty?
+
         if !latest_ref.nil? and !latest_ref.empty? and latest_ref == local_ref and !get_field('force_build')
           write_output "\nReference From Previous Build #{latest_ref} Equals Latest From Repo - Build Not Needed"
           not_needed
         end
       end
-  
+
       def branch
         validate_branch_parameters
 
@@ -260,6 +265,34 @@ module MaestroDev
         end
   
         info
+      end
+
+      # Get a list of ticket id's (from git commit subject lines)
+      # Assume format is "STRING-NUMBER<space>"*.  eg: "JIRA-123 JIRA-456"
+      # with possible bracketing [], {}, (), <> on each one.
+      # @param previous_hash The hash that was last checked out for this repo
+      # @param this_hash The hash that was just checked out for this repo
+      # TODO: Get all commit messages from this -> (last - 1)
+      def get_tickets(previous_hash, this_hash)
+        tickets = []
+
+        result = Maestro::Util::Shell.run_command("cd #{@path} && git log -1 --pretty=format:%s")
+        # Result[0] = exitcode obj, Result[1] = output
+        if result[0].success?
+          subjects = result[1].split("\n")
+
+          subjects.each do |subject|
+            tickets += subject.scan(/\[(\w+-\d+)]/) +
+              subject.scan(/\((\w+-\d+)\)/) +
+              subject.scan(/{(\w+-\d+)}/) +
+              subject.scan(/<(\w+-\d+)>/)
+          end
+        else
+          write_output("\nUnable to retrieve ticket info from commit message.\n#{result[1]}")
+        end
+
+        # Ensure we only return each ticket once regardless of how many times it shows up
+        tickets.flatten.uniq.compact
       end
     end
   end

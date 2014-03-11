@@ -31,7 +31,7 @@ describe MaestroDev::Plugin::GitWorker do
 
     Dir::mkdir(@test_repo_path)
     File.open("#{@test_repo_path}/README", 'w') {|f| f.write("Test") }
-    `cd #{@test_repo_path} && git init && git add README && git commit -m 'readme'`
+    `cd #{@test_repo_path} && git init && git add README && git commit -m '[TICKET-1] [FEATURE-1] readme'`
   end
 
 #  it 'should use a default path when path is not set' do
@@ -110,6 +110,17 @@ describe MaestroDev::Plugin::GitWorker do
       subject.perform(:clone, workitem)
     end
     
+    it 'should get the ticket from the latest commit' do
+      workitem = {'fields' => {'branch' => 'master', 'path' => @test_wc_path, 'url' => @test_repo_path}}
+
+      subject.perform(:clone, workitem)
+
+      File.exists?(@test_wc_path).should be_true
+      
+      tickets = workitem['fields']['__context_outputs__']['tickets']
+      tickets.should == ['TICKET-1', 'FEATURE-1']
+    end    
+
     it 'should detect error if clone some code fails' do
       workitem = {'fields' => {'branch' => 'master', 'path' => @test_wc_path, 'url' => "http://repo.or.cz/asdfasdf/adfasdf.git"}}
       
