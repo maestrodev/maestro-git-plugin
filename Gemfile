@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 #dependencies
 gem 'maestro_plugin', '>=0.0.20'
-gem 'maestro_shell', '>=0.0.8'
+gem 'maestro_shell', '>=1.0.0'
 
 group :development do
   gem 'maestro-plugin-rake-tasks', :require => false

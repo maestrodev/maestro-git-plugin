@@ -145,7 +145,8 @@ module MaestroDev
         errors = []
   
         @executable = get_field('executable', 'git')
-        @path = get_field('path') || default_path
+        @path = get_field('path') && File.expand_path(get_field('path'))
+        @path ||= default_path
         @environment = get_field('environment', '')
         @env = @environment.empty? ? "" : "#{Maestro::Util::Shell::ENV_EXPORT_COMMAND} #{@environment.gsub(/(&&|[;&])\s*$/, '')} && "
   
@@ -204,7 +205,7 @@ module MaestroDev
   
       def get_ref(ref_path)
         show_ref = Maestro::Util::Shell.new
-        show_ref.create_script("cd #{@path}; git show-ref")
+        show_ref.create_script("cd #{@path} && git show-ref")
         show_ref.run_script
         raise PluginError, "Error Detecting Reference: #{show_ref.output}" unless show_ref.exit_code.success?
   
@@ -225,11 +226,16 @@ module MaestroDev
       end
 
       def get_remote_origin
-        url = nil 
-        result = Maestro::Util::Shell.run_command("cd #{@path} && #{@env}#{@executable} config --get remote.origin.url")
+        url = nil
+        cmd = "cd #{@path} && #{@env}#{@executable} config --get remote.origin.url"
+        Maestro.log.debug("Getting git remote origin url: #{cmd}")
+        result = Maestro::Util::Shell.run_command(cmd)
 
         if result[0].success?
           url = result[1].chomp
+          Maestro.log.debug("Got git remote origin url: #{url}")
+        else
+          Maestro.log.warn("Failed to get remote origin url, command failed: #{cmd}")
         end
 
         return url
@@ -243,10 +249,14 @@ module MaestroDev
           :author_name => ''
         }
   
-        result = Maestro::Util::Shell.run_command("cd #{@path} && " + 'git log -1 --pretty=format:%ce,%cN\|%ae,%aN')
+        # batch files in windows need two percentage signs http://support.microsoft.com/kb/75634
+        format = Maestro::Util::Shell::IS_WINDOWS ? "%%ce,%%cN|%%ae,%%aN" : "%ce,%cN|%ae,%aN"
+
+        result = Maestro::Util::Shell.run_command("cd #{@path} && " + "git log -1 --pretty=\"format:#{format}\"")
         # Result[0] = exitcode obj, Result[1] = output
         if result[0].success?
           data = result[1].chomp
+          Maestro.log.debug("Committer info from git: #{data}")
           peeps = data.split('|')
   
           if peeps.size > 0
@@ -261,7 +271,9 @@ module MaestroDev
             info[:author_name] = author[1]
           end
         else
-          write_output("\nUnable to retrieve committer/author info.\n#{result[1]}")
+          msg = "Unable to retrieve committer/author info.\n#{result[1]}"
+          Maestro.log.warn(msg)
+          write_output("\n#{msg}")
         end
   
         info
