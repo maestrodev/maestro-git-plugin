@@ -17,6 +17,7 @@ module MaestroDev
         if File.exists? @path and @clean_working_copy
           write_output("\nDeleting old path - #{@path}", :buffer => true)
           FileUtils.rm_rf @path
+          raise PluginError, "Unable to delete #{@path}" if File.exists? @path
         end
 
         use_clone = true
