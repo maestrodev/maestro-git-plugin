@@ -284,7 +284,7 @@ module MaestroDev
           subjects = result[1].split("\n")
 
           subjects.each do |subject|
-            tickets += subject.scan(/\[(\w+-\d+)]/) +
+            tickets += subject.scan(/\[(\w+-\d+)\]/) +
               subject.scan(/\((\w+-\d+)\)/) +
               subject.scan(/{(\w+-\d+)}/) +
               subject.scan(/<(\w+-\d+)>/)
