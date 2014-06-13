@@ -232,7 +232,7 @@ module MaestroDev
         result = Maestro::Util::Shell.run_command(cmd)
 
         if result[0].success?
-          url = result[1].chomp
+          url = result[1].chomp.split("\n").last # just the last line
           Maestro.log.debug("Got git remote origin url: #{url}")
         else
           Maestro.log.warn("Failed to get remote origin url, command failed: #{cmd}")
@@ -255,7 +255,7 @@ module MaestroDev
         result = Maestro::Util::Shell.run_command("cd #{@path} && " + "git log -1 --pretty=\"format:#{format}\"")
         # Result[0] = exitcode obj, Result[1] = output
         if result[0].success?
-          data = result[1].chomp
+          data = result[1].chomp.split("\n").last # just the last line
           Maestro.log.debug("Committer info from git: #{data}")
           peeps = data.split('|')
   
