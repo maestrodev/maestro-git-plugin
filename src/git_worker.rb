@@ -24,13 +24,13 @@ module MaestroDev
         if File.exists? @path
           remote_url = get_remote_origin
 
-          if remote_url
-            raise PluginError, "Request for git clone of '#{@url}' into '#{@path}', but #{remote_url} already squatting the " +
+          if remote_url != @url
+            raise PluginError, "Request for git clone of '#{@url}' into '#{@path}', but '#{remote_url}' already squatting the " +
               "directory.\nThis usually indicates two compositions are set to use the same directory for their checkouts.\n" +
               "Either manually remove '#{@path}' or select the 'Clean Working Copy' option (if left on this will slow down " +
-              "repeated builds, increase checkout/update time, and generally reduce system efficiency)" if remote_url != @url
-            use_clone = false
+              "repeated builds, increase checkout/update time, and generally reduce system efficiency)"
           end
+          use_clone = false if remote_url
         end
 
         if use_clone
